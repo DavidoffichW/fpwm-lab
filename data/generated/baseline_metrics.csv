@@ -1,0 +1,5 @@
+baseline,mae,rmse,bias
+chronological site trend,0.22545807,0.26981155,-0.06541841
+chronological persistence,0.32022785,0.39595463,-0.26164044
+chronological global mean,0.60255970,0.80275879,0.40227313
+spatial KNN (k=5),0.64961140,0.87629187,0.58684273

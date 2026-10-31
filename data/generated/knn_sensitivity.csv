@@ -1,0 +1,4 @@
+baseline,mae,rmse,bias,neighbours
+spatial KNN (k=3),0.66639253,0.89682842,0.63500084,3
+spatial KNN (k=5),0.64961140,0.87629187,0.58684273,5
+spatial KNN (k=8),0.66778155,0.89168652,0.57609836,8
