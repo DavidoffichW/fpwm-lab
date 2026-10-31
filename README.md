@@ -1,74 +1,94 @@
 # Field Pressure World Model
 
-A notebook-first study of spatial and temporal prediction on a deliberately
-fictional pressure-like field.
+A small, reproducible study of spatial and temporal prediction on a fictional
+pressure-like field.
 
-The point is not to present a finished model. It is to make the research trail
-visible: inspect the observations, change one assumption, look at the result,
-and record what the evidence does—and does not—support.
+Everything here is synthetic: 24 invented sites, 36 synthetic periods,
+normalized coordinates, and values expressed only in synthetic units. The
+repository is designed for inspecting the research process—not for presenting
+a finished model or making claims about a real field.
 
-Everything here is synthetic. Coordinates are normalized, values use synthetic
-units, and site identifiers do not refer to real assets.
+## Start here
 
-## The study
+The notebooks form one continuous investigation. Read them in order.
 
-Read the notebooks in order:
+| Notebook | Question | Main output |
+| --- | --- | --- |
+| [01 — Synthetic field investigation](notebooks/01_synthetic_field_investigation.ipynb) | Can we build a useful synthetic field without hiding its assumptions? | Auditable observations, missingness diagnostics, and controlled noise sensitivity |
+| [02 — Spatial and temporal analysis](notebooks/02_spatial_temporal_analysis.ipynb) | How do graph and holdout choices change the experiment? | Distance diagnostics, graph sensitivity, and leakage-safe partitions |
+| [03 — Evaluation and diagnostics](notebooks/03_evaluation_and_diagnostics.ipynb) | What do simple baselines reveal before model development? | Predictions, residuals, sensitivity checks, and protocol-specific scorecards |
 
-1. [Synthetic field investigation](notebooks/01_synthetic_field_investigation.ipynb) — constructs the fictional observations, diagnoses missingness, and tests measurement-noise sensitivity.
-2. [Spatial and temporal analysis](notebooks/02_spatial_temporal_analysis.ipynb) — examines distances, graph connectivity, chronological leakage, and a disjoint spatial holdout.
-3. [Evaluation and experimental diagnostics](notebooks/03_evaluation_and_diagnostics.ipynb) — evaluates transparent temporal baselines and same-period spatial interpolation.
+Each notebook follows the same rhythm: inspect the data, make one change,
+check the result, visualize it, and explain what the evidence supports.
 
-The working assumptions are intentionally modest:
+## What the study asks
 
-- a smooth synthetic surface, temporal drift, seasonality, site offsets, and one localized perturbation create enough structure for diagnostics;
-- normalized distance can define a computational neighbourhood, but does not establish physical communication;
-- periods 0–27 may train a chronological baseline and periods 28–35 test later-period prediction;
-- five eastern-boundary sites may be withheld to study same-period spatial interpolation.
+1. Can a transparent synthetic generator produce spatial and temporal structure
+   worth investigating?
+2. How should chronological prediction and spatial interpolation be separated
+   so their information boundaries remain honest?
+3. What can simple baselines reveal about residual structure, leakage, and
+   sensitivity before a more complex model is justified?
+
+The working assumptions are deliberately modest. Distance defines a
+computational neighbourhood, not physical communication. Periods 0–27 are used
+for chronological training and periods 28–35 for later-period testing. A
+separate five-site boundary holdout studies same-period spatial interpolation.
+
+## Results at a glance
+
+The two evaluation protocols answer different questions. They are shown
+separately on purpose.
+
+### Later-period prediction
+
+All three baselines train on periods 0–27 and predict observed rows from periods
+28–35.
+
+| Baseline | n | MAE | RMSE | Bias |
+| --- | ---: | ---: | ---: | ---: |
+| Per-site linear trend | 178 | 0.225458 | 0.269812 | -0.065418 |
+| Per-site persistence | 178 | 0.320228 | 0.395955 | -0.261640 |
+| Global mean | 178 | 0.602560 | 0.802759 | 0.402273 |
+
+The per-site trend is the strongest chronological reference in this synthetic
+experiment. Its residuals are still structured, so the result is a useful
+baseline—not a solved forecasting problem.
+
+### Same-period spatial interpolation
+
+The spatial experiment withholds five eastern-boundary sites and predicts them
+from other sites observed during the same period.
+
+| Baseline | n | MAE | RMSE | Bias |
+| --- | ---: | ---: | ---: | ---: |
+| Distance-weighted KNN, k=5 | 157 | 0.649611 | 0.876292 | 0.586843 |
+
+This is interpolation evidence, not a forecast. Results for alternative
+neighbour counts and the controlled noise experiment are collected in
+[RESULTS.md](RESULTS.md).
+
+## A visual tour
+
+### The synthetic field
 
 ![Synthetic pressure-like snapshots at three periods](docs/images/synthetic_field_snapshots.png)
 
-The shared colour scale above comes from the complete synthetic response range.
-No observations are clipped.
+The snapshots share the full synthetic response range; no observations are
+clipped. They show how the constructed spatial surface changes after temporal,
+seasonal, site-level, and localized perturbation components are added.
 
-![Selected computational graph with node degree colouring](docs/images/computational_graph.png)
+### The computational graph
 
-Node colour is graph degree. The graph is a modelling choice over normalized
-coordinates—not a map of subsurface connectivity.
+![Computational graph with nodes coloured by degree](docs/images/computational_graph.png)
 
-## Results
-
-The two evaluation protocols answer different questions and should not be
-treated as one leaderboard.
-
-| Protocol | Domain | Baseline | n | MAE | RMSE | Bias |
-| --- | --- | --- | ---: | ---: | ---: | ---: |
-| Chronological prediction | Periods 28–35; observed test rows | Per-site linear trend | 178 | 0.225458 | 0.269812 | -0.065418 |
-| Chronological prediction | Periods 28–35; observed test rows | Per-site persistence | 178 | 0.320228 | 0.395955 | -0.261640 |
-| Chronological prediction | Periods 28–35; observed test rows | Global mean | 178 | 0.602560 | 0.802759 | 0.402273 |
-| Same-period spatial interpolation | Five eastern-boundary sites; all periods | Distance-weighted KNN, k=5 | 157 | 0.649611 | 0.876292 | 0.586843 |
-
-The temporal trend is the strongest chronological reference on this synthetic
-split. The spatial result is harder and measures interpolation at held-out
-boundary sites using observations from the same period; it is not a forecast.
-See [RESULTS.md](RESULTS.md) for the controlled noise and neighbour-count
-sensitivity tables.
-
-These experiments establish that the synthetic generator is reproducible, the
-evaluation partitions are explicit, and simple assumptions produce measurable
-and diagnosable errors. They do **not** establish geological realism, causal
-behaviour, reservoir communication, calibrated uncertainty, operational
-forecasting performance, or the quality of any private model.
-
-## Data
-
-The generated corpus contains 24 fictional sites across 36 periods: 864 rows,
-of which 801 have an observed target. Generator components remain in the table
-so every synthetic value can be audited. Read the compact [synthetic data card](DATA_CARD.md)
-before reusing the artifacts.
+Node colour represents graph degree. The graph is built from normalized
+distance and is useful for computational experiments only. It is not evidence
+of subsurface connectivity.
 
 ## Reproduce the study
 
-Python 3.10 or newer is supported by the current CI matrix.
+Python 3.10–3.13 is exercised on Windows and Ubuntu in CI.
 
 ### Windows PowerShell
 
@@ -77,14 +97,6 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-dev.txt
 .\.venv\Scripts\python.exe -m jupyter lab
-```
-
-Open the notebooks from `notebooks/` and run them in numeric order.
-
-For a clean headless execution that leaves the committed notebooks untouched:
-
-```powershell
-.\.venv\Scripts\python.exe .\tools\run_notebooks.py --output-dir .\build\executed
 ```
 
 ### macOS or Linux
@@ -96,31 +108,62 @@ python3 -m venv .venv
 .venv/bin/python -m jupyter lab
 ```
 
+Open `notebooks/` and run the three notebooks in numeric order. To execute them
+headlessly without changing the committed copies:
+
 ```bash
-.venv/bin/python tools/run_notebooks.py --output-dir build/executed
+python tools/run_notebooks.py --output-dir build/executed
 ```
 
-The notebooks regenerate `data/generated/` from the recorded seed. Validate the
-research contracts afterward:
+On Windows, replace `python` with `.\.venv\Scripts\python.exe`.
 
-```powershell
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe -m ruff check tools tests
+Then run the research checks:
+
+```bash
+python -m pytest -q
+python -m ruff check .
 ```
+
+The notebooks regenerate every CSV in `data/generated/` from the recorded seed.
+Their deterministic identities are checked by the test suite.
+
+## Repository guide
+
+```text
+notebooks/        the three executed research notebooks
+data/generated/   synthetic observations, partitions, graph edges, and scores
+docs/images/      figures used in this README
+tests/            scientific invariants and publication-boundary checks
+tools/            deterministic notebook execution helper
+DATA_CARD.md      provenance, schema, intended use, and limitations
+RESULTS.md        compact score and sensitivity tables
+```
+
+## What this establishes
+
+The study establishes that its synthetic generator is reproducible, its
+information boundaries are explicit, and its baseline errors can be inspected
+spatially and temporally.
+
+The experiments do **not** establish geological realism, reservoir
+communication, causal behaviour, calibrated uncertainty, operational
+forecasting performance, or the quality of any private model.
+
+Read [DATA_CARD.md](DATA_CARD.md) before reusing the generated artifacts.
 
 ## References
 
-Presentation and reproducible-research structure were informed by the
-[Liquid AI cookbook](https://github.com/Liquid4All/cookbook), its
-[wind-turbine inspection example](https://github.com/Liquid4All/cookbook/tree/main/examples/wind-turbine-inspection),
-and the [Data Engineering Handbook](https://github.com/DataExpert-io/data-engineer-handbook).
-The implementation uses [NumPy](https://numpy.org/),
-[pandas](https://pandas.pydata.org/), [SciPy](https://scipy.org/),
-[NetworkX](https://networkx.org/), [Matplotlib](https://matplotlib.org/), and
+The presentation and research flow were informed by the
+[Liquid AI cookbook](https://github.com/Liquid4All/cookbook) and the
+[Data Engineering Handbook](https://github.com/DataExpert-io/data-engineer-handbook).
+The scientific stack is built with
+[NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/),
+[SciPy](https://scipy.org/), [NetworkX](https://networkx.org/),
+[Matplotlib](https://matplotlib.org/), and
 [scikit-learn](https://scikit-learn.org/).
 
 ## License
 
-An authored-code license has not been selected. The private repository is open
-for owner review, but public redistribution and release remain blocked until
-that decision is recorded.
+No authored-code license has been selected yet. The repository remains private
+for owner review; public redistribution and release remain blocked until a
+license and publication sequence are approved.
