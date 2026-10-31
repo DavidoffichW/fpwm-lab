@@ -18,11 +18,16 @@ NOTEBOOKS = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
+    destination = parser.add_mutually_exclusive_group(required=True)
+    destination.add_argument(
         "--output-dir",
         type=Path,
-        required=True,
         help="Directory that receives executed notebook copies.",
+    )
+    destination.add_argument(
+        "--in-place",
+        action="store_true",
+        help="Replace source notebooks with deterministic executed copies.",
     )
     return parser.parse_args()
 
@@ -31,13 +36,14 @@ def main() -> int:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
     source_dir = root / "notebooks"
-    output_dir = args.output_dir.resolve()
+    output_dir = source_dir if args.in_place else args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for name in NOTEBOOKS:
         source = source_dir / name
         destination = output_dir / name
-        shutil.copy2(source, destination)
+        if not args.in_place:
+            shutil.copy2(source, destination)
         with destination.open(encoding="utf-8") as handle:
             notebook = nbformat.read(handle, as_version=4)
         client = NotebookClient(
