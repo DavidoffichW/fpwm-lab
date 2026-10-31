@@ -55,10 +55,12 @@ def test_private_paths_and_operational_claims_are_absent() -> None:
 def test_publication_boundaries_are_explicit() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8").lower()
     data_card = (ROOT / "DATA_CARD.md").read_text(encoding="utf-8").lower()
+    license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
     assert "everything here is synthetic" in readme
     assert "do **not** establish" in readme
     assert "no private data" in data_card
-    assert "public redistribution and release remain blocked" in readme
+    assert "spdx-license-identifier: mit" in readme
+    assert license_text.startswith("MIT License\n\nCopyright (c) 2026 DavidoffichW")
 
     model_suffixes = {".ckpt", ".onnx", ".pt", ".pth", ".safetensors"}
     public_roots = [ROOT / "notebooks", ROOT / "data", ROOT / "docs"]

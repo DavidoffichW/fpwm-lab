@@ -137,6 +137,7 @@ tests/            scientific invariants and publication-boundary checks
 tools/            deterministic notebook execution helper
 DATA_CARD.md      provenance, schema, intended use, and limitations
 RESULTS.md        compact score and sensitivity tables
+LICENSE           MIT terms for the independently authored repository content
 ```
 
 ## What this establishes
@@ -164,6 +165,9 @@ The scientific stack is built with
 
 ## License
 
-No authored-code license has been selected yet. The repository remains private
-for owner review; public redistribution and release remain blocked until a
-license and publication sequence are approved.
+The independently authored content in this repository is available under the
+[MIT License](LICENSE).
+
+`SPDX-License-Identifier: MIT`
+
+The license does not extend to external projects cited as research references.
