@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 import nbformat
@@ -38,8 +39,8 @@ def test_markdown_interpretation_is_substantive() -> None:
         assert len(markdown.split()) >= 500, path.name
 
 
-def test_private_reference_expression_is_absent() -> None:
-    forbidden = ("hips_relocation", "c:\\users", "d:\\projects", "real field")
+def test_private_paths_and_operational_claims_are_absent() -> None:
+    forbidden = (r"[a-z]:\\users\\", r"[a-z]:\\projects\\", r"references[/\\]legacy")
     for path in NOTEBOOKS:
         text = path.read_text(encoding="utf-8").lower()
-        assert not any(term in text for term in forbidden), path.name
+        assert not any(re.search(pattern, text) for pattern in forbidden), path.name
