@@ -1,7 +1,7 @@
-# Field Pressure World Model
+# FPWM Lab
 
-A small, reproducible study of spatial and temporal prediction on a fictional
-pressure-like field.
+A small, reproducible lab for studying spatial and temporal prediction on a
+fictional pressure-like field.
 
 Everything here is synthetic: 24 invented sites, 36 synthetic periods,
 normalized coordinates, and values expressed only in synthetic units. The

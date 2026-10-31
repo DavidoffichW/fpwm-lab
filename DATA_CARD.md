@@ -2,7 +2,7 @@
 
 ## Intended use
 
-This dataset supports the three Field Pressure World Model R0 notebooks. It is
+This dataset supports the three FPWM Lab R0 notebooks. It is
 a transparent computational fixture for studying diagnostics, evaluation
 partitions, simple baselines, and reproducibility. It is not a representation
 of an operating field or a reservoir simulation.
