@@ -1,34 +1,94 @@
-# Field Pressure World Model
+# FPWM Lab
 
-A small, synthetic research workbench for asking spatial-temporal questions
-about pressure-like observations. The notebooks emphasize inspection,
-diagnostics, and interpretation rather than presenting a finished operational
-model.
+A small, reproducible lab for studying spatial and temporal prediction on a
+fictional pressure-like field.
 
-Everything in this repository is fictional. Coordinates are normalized,
-pressure values use synthetic units, and site identifiers do not correspond to
-real assets. The workbench is not a reservoir simulator, a forecasting service,
-or evidence that geographic proximity implies physical communication.
+Everything here is synthetic: 24 invented sites, 36 synthetic periods,
+normalized coordinates, and values expressed only in synthetic units. The
+repository is designed for inspecting the research process—not for presenting
+a finished model or making claims about a real field.
 
-## What is here
+## Start here
 
-The notebooks are meant to be read and run in order:
+The notebooks form one continuous investigation. Read them in order.
 
-1. `01_synthetic_field_investigation.ipynb` builds and examines a fictional
-   observation set.
-2. `02_spatial_temporal_analysis.ipynb` studies distance graphs, observation
-   coverage, and leakage-resistant evaluation partitions.
-3. `03_evaluation_and_diagnostics.ipynb` introduces simple baselines one at a
-   time and examines their errors and sensitivity.
+| Notebook | Question | Main output |
+| --- | --- | --- |
+| [01 — Synthetic field investigation](notebooks/01_synthetic_field_investigation.ipynb) | Can we build a useful synthetic field without hiding its assumptions? | Auditable observations, missingness diagnostics, and controlled noise sensitivity |
+| [02 — Spatial and temporal analysis](notebooks/02_spatial_temporal_analysis.ipynb) | How do graph and holdout choices change the experiment? | Distance diagnostics, graph sensitivity, and leakage-safe partitions |
+| [03 — Evaluation and diagnostics](notebooks/03_evaluation_and_diagnostics.ipynb) | What do simple baselines reveal before model development? | Predictions, residuals, sensitivity checks, and protocol-specific scorecards |
 
-Calculations stay in short, visible cells. Markdown records the question,
-assumptions, observations, and limitations around each experiment. A small
-runner exists only to verify that the notebooks execute sequentially from clean
-kernels; it does not hide the research workflow.
+Each notebook follows the same rhythm: inspect the data, make one change,
+check the result, visualize it, and explain what the evidence supports.
 
-## Run the notebooks
+## What the study asks
 
-Python 3.10 or newer is recommended.
+1. Can a transparent synthetic generator produce spatial and temporal structure
+   worth investigating?
+2. How should chronological prediction and spatial interpolation be separated
+   so their information boundaries remain honest?
+3. What can simple baselines reveal about residual structure, leakage, and
+   sensitivity before a more complex model is justified?
+
+The working assumptions are deliberately modest. Distance defines a
+computational neighbourhood, not physical communication. Periods 0–27 are used
+for chronological training and periods 28–35 for later-period testing. A
+separate five-site boundary holdout studies same-period spatial interpolation.
+
+## Results at a glance
+
+The two evaluation protocols answer different questions. They are shown
+separately on purpose.
+
+### Later-period prediction
+
+All three baselines train on periods 0–27 and predict observed rows from periods
+28–35.
+
+| Baseline | n | MAE | RMSE | Bias |
+| --- | ---: | ---: | ---: | ---: |
+| Per-site linear trend | 178 | 0.225458 | 0.269812 | -0.065418 |
+| Per-site persistence | 178 | 0.320228 | 0.395955 | -0.261640 |
+| Global mean | 178 | 0.602560 | 0.802759 | 0.402273 |
+
+The per-site trend is the strongest chronological reference in this synthetic
+experiment. Its residuals are still structured, so the result is a useful
+baseline—not a solved forecasting problem.
+
+### Same-period spatial interpolation
+
+The spatial experiment withholds five eastern-boundary sites and predicts them
+from other sites observed during the same period.
+
+| Baseline | n | MAE | RMSE | Bias |
+| --- | ---: | ---: | ---: | ---: |
+| Distance-weighted KNN, k=5 | 157 | 0.649611 | 0.876292 | 0.586843 |
+
+This is interpolation evidence, not a forecast. Results for alternative
+neighbour counts and the controlled noise experiment are collected in
+[RESULTS.md](RESULTS.md).
+
+## A visual tour
+
+### The synthetic field
+
+![Synthetic pressure-like snapshots at three periods](docs/images/synthetic_field_snapshots.png)
+
+The snapshots share the full synthetic response range; no observations are
+clipped. They show how the constructed spatial surface changes after temporal,
+seasonal, site-level, and localized perturbation components are added.
+
+### The computational graph
+
+![Computational graph with nodes coloured by degree](docs/images/computational_graph.png)
+
+Node colour represents graph degree. The graph is built from normalized
+distance and is useful for computational experiments only. It is not evidence
+of subsurface connectivity.
+
+## Reproduce the study
+
+Python 3.10–3.13 is exercised on Windows and Ubuntu in CI.
 
 ### Windows PowerShell
 
@@ -37,14 +97,6 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-dev.txt
 .\.venv\Scripts\python.exe -m jupyter lab
-```
-
-Open the three notebooks in `notebooks/` and run them in numeric order.
-
-To execute the complete sequence without changing the committed notebooks:
-
-```powershell
-.\.venv\Scripts\python.exe .\tools\run_notebooks.py --output-dir .\build\executed
 ```
 
 ### macOS or Linux
@@ -56,38 +108,66 @@ python3 -m venv .venv
 .venv/bin/python -m jupyter lab
 ```
 
-For a headless sequential run:
+Open `notebooks/` and run the three notebooks in numeric order. To execute them
+headlessly without changing the committed copies:
 
 ```bash
-.venv/bin/python tools/run_notebooks.py --output-dir build/executed
+python tools/run_notebooks.py --output-dir build/executed
 ```
 
-The first notebook writes compact synthetic CSV artifacts to
-`data/generated/`. The later notebooks consume those artifacts. Re-running the
-sequence with the recorded seed replaces them deterministically.
+On Windows, replace `python` with `.\.venv\Scripts\python.exe`.
 
-## Validate the workbench
+Then run the research checks:
 
-```powershell
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe -m ruff check tools tests
+```bash
+python -m pytest -q
+python -m ruff check .
 ```
 
-The tests check notebook structure, confidentiality boundaries, sequential
-execution, deterministic synthetic artifacts, and core scientific invariants.
+The notebooks regenerate every CSV in `data/generated/` from the recorded seed.
+Their deterministic identities are checked by the test suite.
 
-## Research boundary
+## Repository guide
 
-The baselines are intentionally modest. In particular, nearest-neighbour
-interpolation is reported as nearest-neighbour interpolation; adding independent
-noise would not make it conditional sequential Gaussian simulation. Empirical
-prediction spread is also not a calibrated uncertainty interval.
+```text
+notebooks/        the three executed research notebooks
+data/generated/   synthetic observations, partitions, graph edges, and scores
+docs/images/      figures used in this README
+tests/            scientific invariants and publication-boundary checks
+tools/            deterministic notebook execution helper
+DATA_CARD.md      provenance, schema, intended use, and limitations
+RESULTS.md        compact score and sensitivity tables
+LICENSE           MIT terms for the independently authored repository content
+```
 
-No private field data, operational assumptions, model weights, or training
-code are included. Results describe this synthetic experiment only.
+## What this establishes
+
+The study establishes that its synthetic generator is reproducible, its
+information boundaries are explicit, and its baseline errors can be inspected
+spatially and temporally.
+
+The experiments do **not** establish geological realism, reservoir
+communication, causal behaviour, calibrated uncertainty, operational
+forecasting performance, or the quality of any private model.
+
+Read [DATA_CARD.md](DATA_CARD.md) before reusing the generated artifacts.
+
+## References
+
+The presentation and research flow were informed by the
+[Liquid AI cookbook](https://github.com/Liquid4All/cookbook) and the
+[Data Engineering Handbook](https://github.com/DataExpert-io/data-engineer-handbook).
+The scientific stack is built with
+[NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/),
+[SciPy](https://scipy.org/), [NetworkX](https://networkx.org/),
+[Matplotlib](https://matplotlib.org/), and
+[scikit-learn](https://scikit-learn.org/).
 
 ## License
 
-An authored-code license has not yet been selected. The repository is suitable
-for local review, but redistribution and public release remain blocked until
-the owner records that decision.
+The independently authored content in this repository is available under the
+[MIT License](LICENSE).
+
+`SPDX-License-Identifier: MIT`
+
+The license does not extend to external projects cited as research references.

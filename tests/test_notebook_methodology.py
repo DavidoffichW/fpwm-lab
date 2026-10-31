@@ -41,6 +41,33 @@ def test_markdown_interpretation_is_substantive() -> None:
 
 def test_private_paths_and_operational_claims_are_absent() -> None:
     forbidden = (r"[a-z]:\\users\\", r"[a-z]:\\projects\\", r"references[/\\]legacy")
-    for path in NOTEBOOKS:
+    public_text = [
+        *NOTEBOOKS,
+        ROOT / "README.md",
+        ROOT / "DATA_CARD.md",
+        ROOT / "RESULTS.md",
+    ]
+    for path in public_text:
         text = path.read_text(encoding="utf-8").lower()
         assert not any(re.search(pattern, text) for pattern in forbidden), path.name
+
+
+def test_publication_boundaries_are_explicit() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8").lower()
+    data_card = (ROOT / "DATA_CARD.md").read_text(encoding="utf-8").lower()
+    license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+    assert "everything here is synthetic" in readme
+    assert "do **not** establish" in readme
+    assert "no private data" in data_card
+    assert "spdx-license-identifier: mit" in readme
+    assert license_text.startswith("MIT License\n\nCopyright (c) 2026 DavidoffichW")
+
+    model_suffixes = {".ckpt", ".onnx", ".pt", ".pth", ".safetensors"}
+    public_roots = [ROOT / "notebooks", ROOT / "data", ROOT / "docs"]
+    model_files = [
+        path
+        for public_root in public_roots
+        for path in public_root.rglob("*")
+        if path.suffix in model_suffixes
+    ]
+    assert not model_files
