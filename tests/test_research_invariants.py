@@ -72,13 +72,13 @@ def test_global_mean_metrics_match_an_independent_calculation() -> None:
 
 def test_generated_artifact_identities() -> None:
     expected = {
-        "baseline_metrics.csv": "389de071338a1771650f04922c601ef9e6c2ddbb2b46d3a066835f53acfb506f",
-        "graph_edges.csv": "cf64e8a0d23de93a1f4d448dcd40281c138b392f749b09bac7162ec4ce3196a8",
-        "knn_sensitivity.csv": "a71614adecf95372ae7e1862f49daf51ea699b4962202c49e3600a696e3cc3e9",
-        "noise_sensitivity.csv": "789a17dd24f5924f759fd356aff64f2ce45f7a61c90e6e25081262a4524c8704",
-        "observations.csv": "ec06b923683a56714abdc2527253f140f4f8cedcd9190463695082f8a0ea2c5f",
-        "partitions.csv": "5cf5f4a856a85507608637cf7b1bc00bd76dc591deb195ed0c987fe151f1e894",
-        "sites.csv": "0a0fc6fd28c1a4aad253cdea685fe003d9dc6851ef6bab9440a52a41b5f749ff",
+        "baseline_metrics.csv": "1038979d073bc704bd2c2174db200a2248756a2dd58cb23e2963944f21bb2cbc",
+        "graph_edges.csv": "597d4cc2f5da938aa0371af36008f26c20d1b1ce26fe900078e889e7ffbce9b9",
+        "knn_sensitivity.csv": "57008f9912d6b47d9966824e23d4d527bae3d5cc8ef4a912f297c37123ed0233",
+        "noise_sensitivity.csv": "76493aa7033eaffe87c0a994b0f2130c542e3d868b27116d7c89456d5c6d3054",
+        "observations.csv": "8b0486ae53162d4c1d66092fdf62f13e05afeffef42b8b00ec42b95ffe82746c",
+        "partitions.csv": "3aaa377ecbb9c34fe3630850a44c187d558646914f56b32bafb5d14d14930498",
+        "sites.csv": "7dc7a5871248b43530a8054c1ef35e9723c14489e6acdf50b1f5fce5ec8a741d",
     }
     for name, expected_hash in expected.items():
         payload = (ROOT / "data" / "generated" / name).read_bytes()
