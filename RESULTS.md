@@ -1,4 +1,4 @@
-# R0 results summary
+# Synthetic experiment results
 
 All values below come from the executed synthetic notebooks. The protocols have
 different information boundaries and answer different questions.
