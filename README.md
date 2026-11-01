@@ -1,12 +1,16 @@
 # FPWM Lab
 
-A small, reproducible lab for studying spatial and temporal prediction on a
-fictional pressure-like field.
+> Fake field, real experiments.
 
-Everything here is synthetic: 24 invented sites, 36 synthetic periods,
-normalized coordinates, and values expressed only in synthetic units. The
-repository is designed for inspecting the research process—not for presenting
-a finished model or making claims about a real field.
+FPWM Lab is a notebook-first look at spatial and time-series baselines on a
+fictional pressure-like field. Everything is synthetic: 24 invented sites, 36
+synthetic periods, normalized coordinates, and values expressed only in
+synthetic units.
+
+That gives the notebooks room to show their work. You can inspect the
+generator, change one assumption, check the graph, and follow the residuals
+without mistaking the result for a claim about a real field or a finished
+model.
 
 ## Start here
 
@@ -21,7 +25,7 @@ The notebooks form one continuous investigation. Read them in order.
 Each notebook follows the same rhythm: inspect the data, make one change,
 check the result, visualize it, and explain what the evidence supports.
 
-## What the study asks
+## Questions worth poking at
 
 1. Can a transparent synthetic generator produce spatial and temporal structure
    worth investigating?
@@ -140,11 +144,10 @@ RESULTS.md        compact score and sensitivity tables
 LICENSE           MIT terms for the independently authored repository content
 ```
 
-## What this establishes
+## What this establishes (and what it doesn't)
 
-The study establishes that its synthetic generator is reproducible, its
-information boundaries are explicit, and its baseline errors can be inspected
-spatially and temporally.
+The synthetic generator is reproducible, the information boundaries are
+explicit, and the baseline errors can be inspected spatially and temporally.
 
 The experiments do **not** establish geological realism, reservoir
 communication, causal behaviour, calibrated uncertainty, operational
