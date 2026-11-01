@@ -3,7 +3,7 @@
 > Fake field, real experiments.
 
 FPWM Lab is a notebook-first look at spatial and time-series baselines on a
-fictional pressure-like field. Everything is synthetic: 24 invented sites, 36
+fictional pressure-like field. Everything here is synthetic: 24 invented sites, 36
 synthetic periods, normalized coordinates, and values expressed only in
 synthetic units.
 
