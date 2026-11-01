@@ -39,6 +39,11 @@ computational neighbourhood, not physical communication. Periods 0–27 are used
 for chronological training and periods 28–35 for later-period testing. A
 separate five-site boundary holdout studies same-period spatial interpolation.
 
+Simple baselines are a deliberate choice: they make leakage risks, holdout
+sensitivity, and residual structure easier to inspect before adding model
+capacity. Chronological prediction and same-period interpolation use different
+information sets, so their scores are not an interchangeable leaderboard.
+
 ## Results at a glance
 
 The two evaluation protocols answer different questions. They are shown
